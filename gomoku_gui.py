@@ -1,3 +1,7 @@
+
+from keras.models import load_model
+from keras.utils import np_utils
+
 import numpy as np
 import pygame
 import sys
@@ -54,14 +58,16 @@ class Board:
         left_turn = right_turn = self.board[y][x]
         right_side = left_side = 0
         for i in range(1, 5):
-            if y+i >= self.col or x+i >= self.row or x-i < 0:
+            if y+i >= self.col:
                 continue
-            if right_turn == self.board[y+i][x+i] and self.board[y+i][x+i] != 0:
-                right_turn = self.board[y+i][x+i]
-                right_side += 1
-            if left_turn == self.board[y+i][x-i] and self.board[y+i][x-i] != 0:
-                left_turn = self.board[y+i][x-i]
-                left_side += 1
+            if x+i < self.row:
+                if right_turn == self.board[y+i][x+i] and self.board[y+i][x+i] != 0:
+                    right_turn = self.board[y+i][x+i]
+                    right_side += 1
+            if x-i >= 0:
+                if x-i >= 0 and left_turn == self.board[y+i][x-i] and self.board[y+i][x-i] != 0:
+                    left_turn = self.board[y+i][x-i]
+                    left_side += 1
         return right_side == 4 or left_side == 4
 
     def check_win(self, turn):
@@ -75,11 +81,15 @@ class Board:
     # def check_draw(self):
     #     return np.amin(self.board) != 0
 
-    def save_board(self, count):
-        file_name = "data/{}.txt".format(count)
+    def save_board(self):
+        file_name = 'data.txt'
         file_name = os.path.join(current_path, file_name)
-        game_data = np.array(self.data)
-        np.savetxt(file_name, game_data, fmt='%d', delimiter=",")
+        txt_file = open(file_name, 'a')
+        str_data = ''
+        for pos in self.data:
+            str_data += dec_to_ennea_pos(pos)
+        txt_file.write(str_data+'\n')
+        txt_file.close()
         print("Save complete.")
 
     def reset_board(self):
@@ -108,6 +118,14 @@ class Tiles:
                 tile_pos = [idx % self.row, idx//self.row]
                 return tile_pos
         return [-1]
+
+
+def dec_to_ennea_pos(dec_pos):
+    ennea = '0123456789abcdefghi'
+    ennea_pos = ''
+    for pos in dec_pos:
+        ennea_pos += ennea[pos % 19]
+    return ennea_pos
 
 
 def draw_marker(screen, board: Board):
@@ -168,7 +186,7 @@ def main():
                 if event.key == pygame.K_RETURN:
                     if win:
                         win = False
-                        board.save_board(game_count)
+                        board.save_board()
                         board.reset_board()
                         turn = 1
                         game_count += 1
@@ -176,6 +194,9 @@ def main():
                     if not win:
                         board.undo()
                         turn = 1 if turn != 1 else -1
+            # elif event.type == pygame.KEYDOWN:
+            #     if event.key == pygame.K_SPACE:
+            #         win = False
 
         draw_marker(screen, board)
 

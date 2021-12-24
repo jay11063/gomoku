@@ -12,7 +12,8 @@ def flip_rotate(board, data):
 
 
 def train_board(positions, x_data, y_data):
-    for i in range(1, len(positions)-1):
+    winner = 0 if len(positions)%2 == 1 else 1
+    for i in range(1+winner, len(positions)-1, 2):
         board_x = np.zeros((19,19))
         board_y = np.zeros((19,19))
 
@@ -29,23 +30,31 @@ def array_to_1D(array):
     for i in range(len(array)):
         array[i] = array[i].flatten()
 
+        
+def ennea_to_dec(ennea):
+    ennea_list = '0123456789abcdefghi'
+    return ennea_list.find(ennea)
 
 X_train = []
 Y_train = []
 
 current_path = os.path.dirname(__file__)
-DIR = os.path.join(current_path, 'data')
-data_count = len([name for name in os.listdir(DIR) if os.path.isfile(os.path.join(DIR, name))])
 
-
-for i in range(data_count):
-    with open(os.path.join(DIR, '{}.txt'.format(i))) as file:
-        lines = file.readlines()
-        lines = [list(map(int, line.rstrip().split(','))) for line in lines]
-        train_board(lines, X_train, Y_train)
+with open(os.path.join(current_path, 'data.txt')) as file:
+    lines = file.readlines()
+    data = []
+    for line in lines:
+        board_data = []
+        line = line[:-1]
+        for i in range(0, len(line), 2):
+            board_data.append(
+                [ennea_to_dec(line[i]), ennea_to_dec(line[i+1])])
+        train_board(board_data, X_train, Y_train)
+        data.append(board_data)
+    data_count = len(data)
 array_to_1D(Y_train)
 
-# print(X_train[-1])
+# print(X_train[-1], data_count)
 
 
 import tensorflow as tf
