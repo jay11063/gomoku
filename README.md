@@ -35,6 +35,10 @@ python two_ai_play_gomoku.py
 
 ### Training AI
 
+```
+python train_model.py
+```
+
 ## Help
 
 Any advise for common problems or issues.
