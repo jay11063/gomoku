@@ -60,7 +60,7 @@ What it does:
 
 ## GitHub Page / README Improvement Suggestions
 
-- Add a board image (`gomoku_board.png`) and a gameplay GIF in this README.
+- Add a gameplay GIF in this README.
 - Add badges (Python version, license, etc.).
 - Add a short “Known Issues” section and keep it updated.
 - Add issue/PR templates under `.github/` for collaboration.
